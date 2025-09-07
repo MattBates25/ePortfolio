@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:title="@string/home"
+        android:icon="@drawable/baseline_home_24" />
+    <item
+        android:id="@+id/progressFragment"
+        android:title="@string/progress"
+        android:icon="@drawable/baseline_calendar_month_24" />
+    <item
+        android:id="@+id/goalFragment"
+        android:title="@string/goal"
+        android:icon="@drawable/baseline_celebration_24" />
+</menu>
