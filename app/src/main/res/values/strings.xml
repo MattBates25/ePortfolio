@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">WeightTrackingApplicationMatthewBates</string>
+    <string name="add_data">Add Data</string>
+    <string name="delete_row">Delete Row</string>
+    <string name="login_greeting">Welcome to Matthew\'s Weight Tracking Application</string>
+    <string name="login_button">Login</string>
+    <string name="account_creation_button">Create Account</string>
+    <string name="username_hint">username</string>
+    <string name="password_hint">password</string>
+    <string name="welcome_to_the_home_fragment">Welcome to the Home Fragment</string>
+    <string name="goal">Goal</string>
+    <string name="progress">Progress</string>
+    <string name="home">Home</string>
+    <string name="login">Login</string>
+    <string name="date">Date</string>
+    <string name="weight">Weight</string>
+    <string name="delete">Delete</string>
+    <string name="delete_date">Delete Selected</string>
+    <string name="recent_date">Most Recent Weight</string>
+    <string name="current_weight_goal_top_text">Current Weight Goal:</string>
+</resources>
