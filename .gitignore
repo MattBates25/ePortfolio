@@ -1,19 +1,19 @@
 # Gradle / builds
 .gradle/
 **/build/
+.externalNativeBuild/
+**/.cxx/
 
 # Android Studio
 .idea/
 *.iml
 captures/
-.externalNativeBuild/
-**/.cxx/
 
 # Local config & keys
 local.properties
+keystore.properties
 *.jks
 *.keystore
-keystore.properties
 
 # Outputs
 *.apk
