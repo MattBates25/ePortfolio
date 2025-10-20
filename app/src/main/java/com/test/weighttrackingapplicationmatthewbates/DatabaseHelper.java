@@ -56,7 +56,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_WEIGHT_GOAL + " REAL, " +
                 COLUMN_PHONE_NUMBER + " TEXT" +
                 ")";
-        db.execSQL(createUserTable);
 
         // SQL statement to create the weights table with a foreign key to the users table
         String createWeightTable = "CREATE TABLE " + TABLE_WEIGHTS + "(" +
@@ -66,7 +65,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_USER_ID + " INTEGER, " +
                 "FOREIGN KEY(" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + ")" +
                 ")";
+        
+        db.execSQL(createUserTable);
         db.execSQL(createWeightTable);
+
+        // Create Indexes for faster lookups on frequently queried columns
+        String userIndex = "CREATE INDEX idx_user_id ON " + TABLE_WEIGHTS + "(" + COLUMN_USER_ID + ")";
+        String dateIndex = "CREATE INDEX idx_date ON " + TABLE_WEIGHTS + "(" + COLUMN_DATE + ")";
+        db.execSQL(userIndex);
+        db.execSQL(dateIndex);
     }
 
     /**
@@ -250,7 +257,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             args[i] = String.valueOf(ids.get(i));
         }
 
-        String whereClause = COLUMN_WEIGHT_ID + " IN (" + placeholders.toString() + ")";
+        String whereClause = COLUMN_WEIGHT_ID + " IN (" + placeholders + ")";
         db.delete(TABLE_WEIGHTS, whereClause, args);
         db.close();
     }
