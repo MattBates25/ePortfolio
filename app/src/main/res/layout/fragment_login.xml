@@ -1,78 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".LoginFragment">
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="3" />
+    <!-- The Guideline has been removed -->
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/login_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/login_greeting"
         android:gravity="center"
+        android:text="@string/login_greeting"
         android:textSize="32sp"
-        android:textStyle="bold"/>
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        app:layout_constraintBottom_toTopOf="@+id/username_input_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-    <Space
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/username_input_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="3" />
-
-
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:autofillHints="username"
-        android:hint="@string/username_hint"
-        android:inputType="text"
-        android:minHeight="48dp" />
+        android:maxWidth="320dp"
+        app:layout_constraintBottom_toTopOf="@+id/password_input_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_title"
+        android:layout_marginTop="64dp">
 
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content"
-        android:autofillHints="password"
-        android:hint="@string/password_hint"
-        android:inputType="textPassword"
-        android:minHeight="48dp"  />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="username"
+            android:hint="@string/username_hint"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <Space
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/password_input_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:maxWidth="320dp"
+        app:layout_constraintBottom_toTopOf="@+id/login_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username_input_layout"
+        app:passwordToggleEnabled="true"
+        android:layout_marginTop="32dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:hint="@string/password_hint"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/login_button"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/login_button" />
+        android:maxWidth="320dp"
+        android:text="@string/login_button"
+        app:layout_constraintBottom_toTopOf="@+id/register_button"
+        app:layout_constraintEnd_toEndOf="@+id/password_input_layout"
+        app:layout_constraintStart_toStartOf="@+id/password_input_layout"
+        app:layout_constraintTop_toBottomOf="@+id/password_input_layout"
+        android:layout_marginTop="64dp"/>
 
     <Button
         android:id="@+id/register_button"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/account_creation_button" />
+        android:maxWidth="320dp"
+        android:text="@string/account_creation_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/login_button"
+        app:layout_constraintStart_toStartOf="@+id/login_button"
+        app:layout_constraintTop_toBottomOf="@+id/login_button"
+        android:layout_marginTop="32dp"/>
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

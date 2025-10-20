@@ -16,20 +16,32 @@ import androidx.navigation.ui.NavigationUI;
 import android.view.View;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * The main and only Activity for the application.
+ * It hosts the NavHostFragment to manage all fragment navigation and handles
+ * the BottomNavigationView. It is also responsible for requesting and handling
+ * runtime permissions like SEND_SMS.
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // A constant code used to identify the SMS permission request.
     private static final int SMS_PERMISSION_CODE = 100;
-    private BottomNavigationView bottomNavigationView; // Declare BottomNavigationView
+    private BottomNavigationView bottomNavigationView;
 
+    /**
+     * Called when the activity is first created. This is where the layout is inflated
+     * and all initial setup for navigation and permissions is performed.
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down
+     *                           then this Bundle contains the data it most recently supplied.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);  // Set the main layout
+        setContentView(R.layout.activity_main);
 
-        // Initialize BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // Setup navigation components
+        // Set up the NavController and link it to the BottomNavigationView and ActionBar.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_progress, R.id.navigation_goal)
                 .build();
@@ -37,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-        // Listener for fragment changes
+        // Add a listener to show or hide the bottom navigation bar based on the current fragment.
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.navigation_login) {
                 hideBottomNavigation();
@@ -46,29 +58,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Check for SMS permission
+        // Check for SMS permission on startup.
         checkSmsPermission();
     }
 
+    /**
+     * Makes the bottom navigation bar visible.
+     */
     public void showBottomNavigation() {
         bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Hides the bottom navigation bar.
+     */
     public void hideBottomNavigation() {
         bottomNavigationView.setVisibility(View.GONE);
     }
 
-    // Method to check if SMS permission is granted
+    /**
+     * Checks if the app has been granted SEND_SMS permission.
+     * If not, it will request the permission from the user.
+     */
     private void checkSmsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         }
-        // else, permission already granted
     }
 
-    // Handle the result of the permission request
+    /**
+     * Callback for the result from requesting permissions.
+     * This method is invoked for every call on requestPermissions().
+     * @param requestCode The request code passed in requestPermissions().
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions. Never null.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -76,24 +102,34 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == SMS_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
                 Toast.makeText(this, "SMS Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
-                // Permission denied, continue app without SMS feature
                 Toast.makeText(this, "SMS Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // Method to send SMS notification (placeholder)
+    /**
+     * Sends an SMS message to the given phone number.
+     * It first checks for permission and sanitizes the phone number before sending.
+     * @param phoneNumber The destination phone number.
+     * @param message The body of the SMS message.
+     */
     public void sendSMSNotification(String phoneNumber, String message) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 == PackageManager.PERMISSION_GRANTED) {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-            Toast.makeText(this, "SMS sent to " + phoneNumber, Toast.LENGTH_SHORT).show();
+            try {
+                // Sanitize the phone number to be only digits to improve reliability.
+                String sanitizedPhoneNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(sanitizedPhoneNumber, null, message, null, null);
+                Toast.makeText(this, "Goal reached SMS sent to " + sanitizedPhoneNumber, Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                // Catches any error during sending, e.g., invalid number format after sanitizing
+                Toast.makeText(this, "SMS failed to send. Please check the phone number format.", Toast.LENGTH_LONG).show();
+            }
         } else {
-            // Permission not granted
             Toast.makeText(this, "SMS permission not granted", Toast.LENGTH_SHORT).show();
         }
     }

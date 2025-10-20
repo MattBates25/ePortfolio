@@ -9,21 +9,21 @@
         android:id="@+id/editTextDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter date (YYYY-MM-DD)"
+        android:hint="@string/enter_date_yyyy_mm_dd"
         android:inputType="date" />
 
     <EditText
         android:id="@+id/editTextWeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter weight"
+        android:hint="@string/enter_weight"
         android:inputType="numberDecimal" />
 
     <Button
         android:id="@+id/buttonAddWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Weight"
+        android:text="@string/add_weight"
         android:layout_gravity="end"
         android:layout_marginTop="16dp"/>
 </LinearLayout>
