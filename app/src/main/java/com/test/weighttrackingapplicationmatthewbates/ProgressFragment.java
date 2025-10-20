@@ -12,19 +12,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * A fragment that displays a grid of the user's weight history.
- * It allows users to add new weight entries and delete existing ones.
- * It also triggers SMS notifications when a user's weight meets their goal.
+ * It allows users to add new weight entries, delete existing ones, and sort the displayed entries.
  */
 public class ProgressFragment extends Fragment {
 
@@ -32,14 +36,11 @@ public class ProgressFragment extends Fragment {
     private WeightAdapter weightAdapter;
     private List<ProgressItem> weightItemList;
     private DatabaseHelper databaseHelper;
+    private Spinner sortSpinner;
 
     /**
-     * Inflates the layout for this fragment, initializes the RecyclerView, adapter, database helper,
-     * and sets up click listeners for the buttons.
-     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
-     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
-     * @return The View for the fragment's UI.
+     * Inflates the layout, initializes all UI components including the RecyclerView and Spinner,
+     * and sets up listeners for user actions.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,7 +54,25 @@ public class ProgressFragment extends Fragment {
         weightAdapter = new WeightAdapter(weightItemList);
         recyclerView.setAdapter(weightAdapter);
 
-        loadWeightData();
+        // Setup Sort Spinner
+        sortSpinner = view.findViewById(R.id.sort_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.sort_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(adapter);
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                loadWeightData(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+
+        loadWeightData(SortUtils.DATE_NEWEST); // Initial load
 
         Button addWeightButton = view.findViewById(R.id.add_weight_button);
         addWeightButton.setOnClickListener(v -> addWeight());
@@ -65,16 +84,26 @@ public class ProgressFragment extends Fragment {
     }
 
     /**
-     * Loads all weight entries for the current user from the database and updates the RecyclerView.
+     * Loads weight entries from the database based on the selected sort option.
+     * For standard sorting, it relies on the database's ORDER BY clause.
+     * For custom sorting, it fetches unsorted data and sorts it in Java.
+     * @param sortOption The selected sort option constant from SortUtils.
      */
-    private void loadWeightData() {
+    private void loadWeightData(int sortOption) {
         weightItemList.clear();
+        weightAdapter.clearSelection();
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE);
         int userId = sharedPreferences.getInt(AppConstants.KEY_USER_ID, -1);
 
         if (userId != -1) {
-            weightItemList.addAll(databaseHelper.getAllWeightEntries(userId));
+            if (sortOption == SortUtils.DISTANCE_FROM_GOAL) {
+                // Handle custom sort in Java
+                sortEntriesByDistanceFromGoal(userId);
+            } else {
+                // Handle standard sorts using the database
+                weightItemList.addAll(databaseHelper.getAllWeightEntries(userId, sortOption));
+            }
             weightAdapter.notifyDataSetChanged();
         } else {
             Toast.makeText(getContext(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
@@ -82,9 +111,37 @@ public class ProgressFragment extends Fragment {
     }
 
     /**
+     * A custom sorting implementation as described in the enhancement plan.
+     * It fetches the user's goal, calculates the absolute distance for each entry, and sorts the list.
+     * @param userId The ID of the current user.
+     */
+    private void sortEntriesByDistanceFromGoal(int userId) {
+        Float goalWeight = databaseHelper.getWeightGoal(userId);
+        if (goalWeight == null) {
+            // If no goal is set, sorting by distance is not possible. Default to standard sort.
+            weightItemList.addAll(databaseHelper.getAllWeightEntries(userId, SortUtils.DATE_NEWEST));
+            Toast.makeText(getContext(), getString(R.string.error_no_goal_for_sort), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Fetch unsorted data to sort in Java
+        List<ProgressItem> unsortedList = databaseHelper.getAllWeightEntries(userId, SortUtils.DATE_NEWEST); // or any default
+
+        unsortedList.sort(new Comparator<ProgressItem>() {
+            @Override
+            public int compare(ProgressItem p1, ProgressItem p2) {
+                float dist1 = Math.abs(p1.getWeight() - goalWeight);
+                float dist2 = Math.abs(p2.getWeight() - goalWeight);
+                return Float.compare(dist1, dist2); // Ascending order
+            }
+        });
+
+        weightItemList.addAll(unsortedList);
+    }
+
+
+    /**
      * Displays a dialog for the user to add a new weight entry.
-     * The dialog uses a DatePickerDialog for reliable date input and validates the weight input.
-     * On success, it saves the entry to the database and checks if the user's goal has been met.
      */
     private void addWeight() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -150,7 +207,8 @@ public class ProgressFragment extends Fragment {
                     }
                 }
 
-                loadWeightData();
+                // Reload data with the current sort option
+                loadWeightData(sortSpinner.getSelectedItemPosition());
                 dialog.dismiss();
             } else {
                 Toast.makeText(getContext(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
@@ -162,13 +220,13 @@ public class ProgressFragment extends Fragment {
 
     /**
      * Deletes all weight entries that have been selected by the user in the adapter.
-     * It retrieves a list of unique IDs from the adapter and passes them to the database for deletion.
      */
     private void deleteSelectedWeights() {
         List<Integer> selectedIds = weightAdapter.getSelectedItemIds();
         if (!selectedIds.isEmpty()) {
             databaseHelper.deleteSelectedWeightsById(selectedIds);
-            loadWeightData();
+            // Reload data with the current sort option
+            loadWeightData(sortSpinner.getSelectedItemPosition());
         }
     }
 }

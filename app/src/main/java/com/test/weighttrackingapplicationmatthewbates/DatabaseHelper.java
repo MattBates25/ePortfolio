@@ -180,18 +180,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Retrieves all weight entries for a specific user from the database.
+     * Retrieves all weight entries for a specific user from the database, with a specified sort order.
      * @param userId The ID of the user whose entries to fetch.
+     * @param sortOption A constant from SortUtils defining the sort order.
      * @return A List of ProgressItem objects representing all weight entries.
      */
-    public List<ProgressItem> getAllWeightEntries(int userId) {
+    public List<ProgressItem> getAllWeightEntries(int userId, int sortOption) {
         List<ProgressItem> weightEntries = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+
+        String orderByClause;
+        switch (sortOption) {
+            case SortUtils.DATE_OLDEST:
+                orderByClause = COLUMN_DATE + " ASC";
+                break;
+            case SortUtils.WEIGHT_HIGHEST:
+                orderByClause = COLUMN_WEIGHT + " DESC";
+                break;
+            case SortUtils.WEIGHT_LOWEST:
+                orderByClause = COLUMN_WEIGHT + " ASC";
+                break;
+            case SortUtils.DATE_NEWEST:
+            default:
+                orderByClause = COLUMN_DATE + " DESC";
+                break;
+        }
+
         Cursor cursor = db.query(TABLE_WEIGHTS,
                 new String[]{COLUMN_WEIGHT_ID, COLUMN_DATE, COLUMN_WEIGHT},
                 COLUMN_USER_ID + "=?", // Filter by user ID
                 new String[]{String.valueOf(userId)}, // Pass userId here
-                null, null, null);
+                null, null, orderByClause);
 
         if (cursor.moveToFirst()) {
             do {

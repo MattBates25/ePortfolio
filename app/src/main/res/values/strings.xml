@@ -54,6 +54,7 @@
     <string name="error_date_required">Please select a date</string>
     <string name="error_weight_required">Please enter a weight</string>
     <string name="goal_reached_sms_message">Congratulations! You\'ve reached your weight goal!</string>
+    <string name="error_no_goal_for_sort">Set a weight goal to sort by distance</string>
 
     <!-- For assorted Layouts -->
     <string name="enter_new_weight_goal">Enter new weight goal</string>
@@ -69,6 +70,21 @@
     <string name="weight_goal">Weight goal</string>
     <string name="recent_weight">RECENT WEIGHT</string>
     <string name="home_goal">GOAL</string>
+    <string name="weight_history">Weight History</string>
 
+    <!-- For MainActivity SMS Handling -->
+    <string name="sms_permission_granted">SMS Permission Granted</string>
+    <string name="sms_permission_denied">SMS Permission Denied</string>
+    <string name="sms_sent_success">Goal reached SMS sent to %s</string>
+    <string name="sms_sent_fail">SMS failed to send. Please check the phone number.</string>
+    <string name="sms_permission_not_granted">SMS permission not granted</string>
 
+    <!-- For ProgressFragment Sorting -->
+    <string-array name="sort_options">
+        <item>Sort by: Date (Newest)</item>
+        <item>Sort by: Date (Oldest)</item>
+        <item>Sort by: Weight (Highest)</item>
+        <item>Sort by: Weight (Lowest)</item>
+        <item>Sort by: Distance from Goal</item>
+    </string-array>
 </resources>

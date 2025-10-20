@@ -102,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == SMS_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "SMS Permission Granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.sms_permission_granted), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "SMS Permission Denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.sms_permission_denied), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -124,13 +124,13 @@ public class MainActivity extends AppCompatActivity {
 
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(sanitizedPhoneNumber, null, message, null, null);
-                Toast.makeText(this, "Goal reached SMS sent to " + sanitizedPhoneNumber, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.sms_sent_success, sanitizedPhoneNumber), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 // Catches any error during sending, e.g., invalid number format after sanitizing
-                Toast.makeText(this, "SMS failed to send. Please check the phone number format.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.sms_sent_fail), Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, "SMS permission not granted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.sms_permission_not_granted), Toast.LENGTH_SHORT).show();
         }
     }
 
